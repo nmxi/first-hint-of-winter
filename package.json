@@ -1,0 +1,15 @@
+{
+  "name": "fuyu-no-hajimari",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "slice": "node tools/slice.mjs",
+    "depth": "node tools/depth.mjs",
+    "serve": "node tools/serve.mjs"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "^4.3.2",
+    "puppeteer-core": "^25.17.0",
+    "sharp": "^0.35.5"
+  }
+}

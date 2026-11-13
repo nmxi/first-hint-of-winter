@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>冬の始まり</title>
+  <meta name="theme-color" content="#f4efe5">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="paper" aria-label="冬の始まりの風景が水彩で描かれていく"></canvas>
+  <h1 id="title">冬の始まり</h1>
+  <p id="count" aria-live="off"></p>
+  <p id="hint">クリックで次の景へ ・ 長押しで早く描く</p>
+  <button id="tilt" type="button" hidden>傾きで視点を動かす</button>
+  <p id="tilt-status" class="sr-only" role="status"></p>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
