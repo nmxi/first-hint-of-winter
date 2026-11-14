@@ -1,6 +1,7 @@
 import { Renderer } from './renderer.js';
 import { Camera } from './camera.js';
 import { shuffleScenes } from './shuffle.js';
+import { createHintContrast } from './hint-contrast.js';
 import { Sequence, PAINT } from './sequence.js';
 
 const canvas = document.getElementById('paper');
@@ -29,8 +30,8 @@ async function main() {
   const order = q.has('scene') ? scenes : shuffleScenes(scenes);
   const camera = new Camera(canvas, debug.cam);
   const tiltButton = document.getElementById('tilt');
-  if (!debug.cam && camera.tiltSupported &&
-      (camera.tiltNeedsPermission || window.matchMedia('(pointer: coarse)').matches)) {
+  const isPhone = navigator.userAgentData?.mobile ?? /iPhone|iPod|Android.*Mobile/i.test(navigator.userAgent);
+  if (!debug.cam && isPhone && camera.tiltSupported) {
     tiltButton.hidden = false;
     tiltButton.textContent = camera.tiltNeedsPermission ? '傾きで視点を動かす' : '傾きの基準を合わせる';
     tiltButton.addEventListener('click', async () => {
@@ -59,7 +60,7 @@ async function main() {
   await seq.start(debug.t);
   document.body.classList.add('ready');
 
-  // 操作: クリック/タップ・スペース・→ で次の景、← で前の景、長押しで早く描く
+  // 操作: クリック/タップ・スペース・→ で次の景、← で前の景、長押しで早送り
   let held = false, holdTimer = 0, down = null, fast = false;
   const hideHint = () => hint.classList.remove('show');
   canvas.addEventListener('pointerdown', (e) => {
@@ -85,6 +86,7 @@ async function main() {
   setTimeout(() => hint.classList.add('show'), 2500);
   setTimeout(hideHint, 11000);
 
+  const updateHintContrast = createHintContrast(renderer.gl, canvas, hint);
   let last = performance.now(), slow = 0;
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
@@ -95,6 +97,7 @@ async function main() {
     camera.update(dt);
     if (!debug.freeze) seq.update(dt * debug.speed * (fast ? 8 : 1));
     seq.draw(camera);
+    updateHintContrast(now);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);

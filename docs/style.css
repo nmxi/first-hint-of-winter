@@ -20,6 +20,7 @@ html, body {
 }
 
 #title, #count, #hint {
+  color: #000;
   position: fixed;
   margin: 0;
   pointer-events: none;
@@ -53,7 +54,7 @@ html, body {
 }
 
 body.ready #title, body.ready #count { opacity: 0.75; }
-#hint.show { opacity: 0.6; }
+#hint.show { opacity: 0.95; }
 body.nogl #hint { bottom: 50%; white-space: normal; text-align: center; }
 
 @media (max-width: 560px) {
