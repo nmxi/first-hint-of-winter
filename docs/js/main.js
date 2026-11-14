@@ -1,5 +1,6 @@
 import { Renderer } from './renderer.js';
 import { Camera } from './camera.js';
+import { setupTiltControls } from './tilt-controls.js';
 import { shuffleScenes } from './shuffle.js';
 import { createHintContrast } from './hint-contrast.js';
 import { Sequence, PAINT } from './sequence.js';
@@ -17,6 +18,9 @@ const debug = {
 };
 
 async function main() {
+  // 公開ファイルの読み込みや描画初期化が失敗しても、スマホの操作ボタンは表示する。
+  const camera = new Camera(canvas, debug.cam);
+  setupTiltControls(camera);
   let renderer;
   try { renderer = new Renderer(canvas); }
   catch (e) {
@@ -28,29 +32,6 @@ async function main() {
   const { order: scenes } = await (await fetch('assets/scenes.json')).json();
   // scene指定の検証では元の順番を保つ。
   const order = q.has('scene') ? scenes : shuffleScenes(scenes);
-  const camera = new Camera(canvas, debug.cam);
-  const tiltButton = document.getElementById('tilt');
-  const isPhone = navigator.userAgentData?.mobile ?? /iPhone|iPod|Android.*Mobile/i.test(navigator.userAgent);
-  if (!debug.cam && isPhone && camera.tiltSupported) {
-    tiltButton.hidden = false;
-    tiltButton.textContent = camera.tiltNeedsPermission ? '傾きで視点を動かす' : '傾きの基準を合わせる';
-    tiltButton.addEventListener('click', async () => {
-      tiltButton.disabled = true;
-      try {
-        const enabled = await camera.enableTilt();
-        tiltButton.textContent = enabled ? '傾きの基準を合わせる' : '傾きの許可を再試行';
-        document.getElementById('tilt-status').textContent = enabled
-          ? '端末を傾けると視点が動きます。'
-          : '傾きへのアクセスが許可されませんでした。ブラウザの設定を確認してください。';
-      } catch (e) {
-        tiltButton.textContent = '傾きの許可を再試行';
-        document.getElementById('tilt-status').textContent = '傾きを利用できませんでした。ブラウザの設定を確認してください。';
-        console.error(e);
-      } finally {
-        tiltButton.disabled = false;
-      }
-    });
-  }
   const pad = (n) => String(n).padStart(2, '0');
   const seq = new Sequence(renderer, order, {
     start: Math.max(0, Math.min(order.length - 1, debug.scene | 0)),
